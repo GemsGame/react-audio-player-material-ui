@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import AudioPlayer from "./components/AudioPlayer.js";
+import ReactAudioPlayer from "./components/ReactAudioPlayer.js";
 
 function App() {
   const style = {
@@ -16,7 +16,7 @@ function App() {
   return (
     <>
       <div style={style.center}>
-        <AudioPlayer trackLink="https://www.free-stock-music.com/music/jay-someday-family-business.mp3" />
+        <ReactAudioPlayer trackLink="https://www.free-stock-music.com/music/jay-someday-family-business.mp3" />
         <h1 style={style.h1}>
           Simple react audio player component + material ui.
           <br />

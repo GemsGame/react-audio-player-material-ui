@@ -2,16 +2,16 @@ import React, { Component } from "react";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PauseIcon from "@material-ui/icons/Pause";
 
-let timer;
+class ReactAudioPlayer extends Component {
 
-class AudioPlayer extends Component {
   state = {
-    audioElement: Object,
+    audioElement: new Audio(),
     timelineElement: Object,
     playTime: 0,
     playButton: false,
-    timeline: Number
-  };
+    timeline: Number,
+    timer: 0
+  }
 
   playMusic = () => {
     if (this.state.playTime === 0) {
@@ -20,79 +20,69 @@ class AudioPlayer extends Component {
     this.state.audioElement.play();
     this.setState({ playButton: true });
     this.musicTimer();
-  };
+  }
 
   musicTimer = () => {
-    timer = setInterval(() => {
-      this.setState({ playTime: (this.state.playTime -= 0.1) });
-      this.timelineUpdate();
-      this.stopTimer();
-    }, 100);
-  };
+    this.setState({
+      timer: setInterval(() => {
+        this.setState({ playTime: this.state.playTime -= 0.10 });
+        this.timelineUpdate();
+        this.stopTimer();
+      }, 100)
+    })
+
+
+  }
 
   stopTimer = () => {
     if (this.state.playButton === false) {
-      clearInterval(timer);
+      clearInterval(this.state.timer);
     }
     if (this.state.playTime <= 0) {
-      clearInterval(timer);
-      this.setState({ playTime: (this.state.playTime = 0) });
+      clearInterval(this.state.timer);
+      this.setState({ playTime: this.state.playTime = 0 });
     }
-  };
+  }
   pauseMusic = () => {
     this.state.audioElement.pause();
     this.setState({ playButton: false });
-  };
+  }
   timelineUpdate = () => {
-    this.setState({
-      timeline: (this.state.playTime * 100) / this.state.audioElement.duration
-    });
-  };
-
-  clickOnTimeLine = event => {
-    this.state.audioElement.currentTime =
-      this.state.audioElement.duration * this.clickPercent(event);
-
-    this.setState({
-      playTime:
-        this.state.audioElement.duration - this.state.audioElement.currentTime
-    });
-  };
-  clickPercent = event => {
-    return (
-      (event.clientX - this.getPosition()) /
-      this.state.timelineElement.offsetWidth
-    );
-  };
-
-  getPosition = () => {
-    return this.state.timelineElement.getBoundingClientRect().left;
-  };
-
-  componentDidMount() {
-    this.setState({ audioElement: document.getElementById("player") });
-    this.setState({ timelineElement: document.getElementById("timeline") });
+    this.setState({ timeline: this.state.playTime * 100 / this.state.audioElement.duration });
   }
 
+  clickOnTimeLine = (event) => {
+    this.state.audioElement.currentTime = this.state.audioElement.duration * this.clickPercent(event);
+
+
+    this.setState({ playTime: this.state.audioElement.duration - this.state.audioElement.currentTime })
+  }
+  clickPercent = (event) => {
+    return (event.clientX - this.getPosition()) / this.state.timelineElement.offsetWidth;
+  }
+
+  getPosition = () => {
+
+    return this.state.timelineElement.getBoundingClientRect().left;
+  }
+
+
+  componentDidMount() {
+    this.state.audioElement.src = this.props.trackLink;
+    this.setState({ timelineElement: document.getElementById('timeline') });
+  }
+
+
   render() {
+
     const { trackLink } = this.props;
     let button;
     let duration;
     if (this.state.playButton === false) {
-      button = (
-        <PlayArrowIcon
-          style={{ color: "white", backgroundColor: "#536DFE" }}
-          onClick={() => this.playMusic()}
-        />
-      );
+      button = <PlayArrowIcon style={{ color: 'white', backgroundColor: '#536DFE' }} onClick={() => this.playMusic()} />
     }
     if (this.state.playButton === true) {
-      button = (
-        <PauseIcon
-          style={{ color: "white", backgroundColor: "#536DFE" }}
-          onClick={() => this.pauseMusic()}
-        />
-      );
+      button = <PauseIcon style={{ color: 'white', backgroundColor: '#536DFE' }} onClick={() => this.pauseMusic()} />
     }
     if (this.state.audioElement.duration) {
       duration = this.state.playTime.toFixed(2);
@@ -104,10 +94,8 @@ class AudioPlayer extends Component {
         padding: "10px",
         display: "grid",
         gridGap: "5px",
-
         alignContent: "center",
         textAlign: "center",
-
         gridTemplateColumns: "0.1fr 0.7fr 0.2fr",
         justifyContent: "start",
         alignItems: "center",
@@ -142,20 +130,23 @@ class AudioPlayer extends Component {
       }
     };
     return (
+
       <div style={style.player}>
-        <audio id="player" src={trackLink} />
-        <div style={style.controller}>{button}</div>
-        <div
-          id="timeline"
-          style={style.timeline}
-          onClick={event => this.clickOnTimeLine(event)}
-        >
-          <div style={style.timelineVision} />
+
+        <audio id='player' src={trackLink}></audio>
+        <div style={style.controller}>
+          {button}
         </div>
-        <div style={style.timer}>{duration}</div>
+        <div id='timeline' style={style.timeline} onClick={event => this.clickOnTimeLine(event)}>
+          <div style={style.timelineVision}></div>
+        </div>
+        <div style={style.timer}>
+          {duration}
+        </div>
       </div>
-    );
+    )
   }
 }
 
-export default AudioPlayer;
+
+export default ReactAudioPlayer;
